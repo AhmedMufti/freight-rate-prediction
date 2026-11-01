@@ -1,0 +1,37 @@
+{
+  "outlier_mode": "drop",
+  "target": "log_rpm",
+  "qs_variant": "none",
+  "use_mi": false,
+  "mi_date_mean": false,
+  "recency_halflife": 3,
+  "lgbm_params": {
+    "learning_rate": 0.03,
+    "num_leaves": 31,
+    "min_child_samples": 80,
+    "feature_fraction": 0.8,
+    "bagging_fraction": 0.8,
+    "bagging_freq": 1,
+    "lambda_l2": 1.0,
+    "objective": "huber"
+  },
+  "n_final": 315,
+  "seed_sd_mae_pct": 0.7437,
+  "gate_pct": 1.4874,
+  "dec_qs_method": "none",
+  "dec_mi_smoothing": false,
+  "_why": {
+    "seed_sd_mae_pct": "seed sd of mean-MAE over 3 seeds = 0.744% (MAEs [163.54, 164.5, 165.98]); gate = max(0.5, 2*sd)",
+    "gate_pct": "seed sd of mean-MAE over 3 seeds = 0.744% (MAEs [163.54, 164.5, 165.98]); gate = max(0.5, 2*sd)",
+    "outlier_mode": "outlier_target sweep (gate 1.49%): winner drop|log_rpm. keep|log_rate vs keep|log_rpm: gain -8.07% (gate 1.49%), F3 117.0 vs 105.9, gap 118.4 vs 106.7 -> reject | drop|log_rpm vs keep|log_rpm: gain +1.79% (gate 1.49%), F3 100.6 vs 105.9, gap 102.2 vs 106.7 -> ADOPT | drop|log_rate vs drop|log_rpm: gain -3.78% (gate 1.49%), F3 106.7 vs 100.6, gap 108.2 vs 102.2 -> reject | weight|log_rpm vs drop|log_rpm: gain +0.22% (gate 1.49%), F3 100.7 vs 100.6, gap 102.0 vs 102.2 -> reject | weight|log_rate vs drop|log_rpm: gain -3.93% (gate 1.49%), F3 106.7 vs 100.6, gap 108.2 vs 102.2 -> reject; smearing check on F3 for drop|log_rpm: MAE 100.6 plain vs 108.6 with smear factor (factor from inner holdout residuals)",
+    "target": "outlier_target sweep (gate 1.49%): winner drop|log_rpm. keep|log_rate vs keep|log_rpm: gain -8.07% (gate 1.49%), F3 117.0 vs 105.9, gap 118.4 vs 106.7 -> reject | drop|log_rpm vs keep|log_rpm: gain +1.79% (gate 1.49%), F3 100.6 vs 105.9, gap 102.2 vs 106.7 -> ADOPT | drop|log_rate vs drop|log_rpm: gain -3.78% (gate 1.49%), F3 106.7 vs 100.6, gap 108.2 vs 102.2 -> reject | weight|log_rpm vs drop|log_rpm: gain +0.22% (gate 1.49%), F3 100.7 vs 100.6, gap 102.0 vs 102.2 -> reject | weight|log_rate vs drop|log_rpm: gain -3.93% (gate 1.49%), F3 106.7 vs 100.6, gap 108.2 vs 102.2 -> reject; smearing check on F3 for drop|log_rpm: MAE 100.6 plain vs 108.6 with smear factor (factor from inner holdout residuals)",
+    "qs_variant": "market sweep (gate 1.49%): winner no_qs_no_mi. no_qs vs no_qs_no_mi: gain +5.19% (gate 1.49%), F3 145.0 vs 106.3, gap 143.7 vs 108.2 -> reject | no_mi vs no_qs_no_mi: gain -14.50% (gate 1.49%), F3 96.7 vs 106.3, gap 103.2 vs 108.2 -> reject | full vs no_qs_no_mi: gain -19.44% (gate 1.49%), F3 124.3 vs 106.3, gap 129.0 vs 108.2 -> reject | qs_dev vs no_qs_no_mi: gain -24.10% (gate 1.49%), F3 148.3 vs 106.3, gap 136.1 vs 108.2 -> reject",
+    "use_mi": "market sweep (gate 1.49%): winner no_qs_no_mi. no_qs vs no_qs_no_mi: gain +5.19% (gate 1.49%), F3 145.0 vs 106.3, gap 143.7 vs 108.2 -> reject | no_mi vs no_qs_no_mi: gain -14.50% (gate 1.49%), F3 96.7 vs 106.3, gap 103.2 vs 108.2 -> reject | full vs no_qs_no_mi: gain -19.44% (gate 1.49%), F3 124.3 vs 106.3, gap 129.0 vs 108.2 -> reject | qs_dev vs no_qs_no_mi: gain -24.10% (gate 1.49%), F3 148.3 vs 106.3, gap 136.1 vs 108.2 -> reject",
+    "use_mi_audit": "re-checked on the final config (scripts/mi_audit.py, outputs/mi_audit.md, 3 seeds, folds F1-F3, gap and oct1 = fit Jan-Sep/test Oct): raw MI, date-mean MI, monotone MI and a log(MI) offset all cut mean MAE 8-12% (F1/F2) but worsen F3 by 26-30% and oct1 by 11-15%; short-run-only MI offsets (log MI minus trailing 7/14/28-day mean) are within +0.4/-1.4% on mean (below the 1.49% gate) and worse on oct1 -> keep use_mi=false",
+    "recency_halflife": "recency sweep (gate 1.49%): winner h=3. h=3 vs h=0: gain +2.56% (gate 1.49%), F3 101.4 vs 101.4, gap 102.1 vs 104.0 -> ADOPT | h=6 vs h=3: gain -0.80% (gate 1.49%), F3 100.6 vs 101.4, gap 102.2 vs 102.1 -> reject",
+    "lgbm_params": "tune: incumbent nl63_mcs40_l2 mean 130.84; best grid nl31_mcs80_huber mean 128.72 (gain +1.62%, gate 1.49%, F3 98.4 vs 101.4, gap 99.3 vs 102.1) -> ADOPT; n_final = round(1.1 * median inner iters [286, 160, 1980]) = 315",
+    "n_final": "tune: incumbent nl63_mcs40_l2 mean 130.84; best grid nl31_mcs80_huber mean 128.72 (gain +1.62%, gate 1.49%, F3 98.4 vs 101.4, gap 99.3 vs 102.1) -> ADOPT; n_final = round(1.1 * median inner iters [286, 160, 1980]) = 315",
+    "dec_mi_smoothing": "Dec MI day-to-day sd is 0.99x the train sd (rule: smooth if > 2x)",
+    "dec_qs_method": "qs marginalised over the day's validation loads under 600 mi (Jensen) when qs is a feature"
+  }
+}

@@ -1,0 +1,15 @@
+{
+ "rows_train": 48000,
+ "rows_val": 12000,
+ "corr_loglog": 0.9674098717592707,
+ "rpm_median_by_equipment": {
+  "Dry Van": 2.046,
+  "Flatbed": 2.22,
+  "Reefer": 2.312
+ },
+ "mi_lag1_autocorr": 0.9267087057894363,
+ "mi_sd_within_date": 0.024840982737319103,
+ "mi_sd_between_dates": 0.16516696707244244,
+ "train_rows_per_day": 157.89473684210526,
+ "val_rows_per_day": 196.72131147540983
+}

@@ -1,0 +1,40 @@
+{
+ "train": {
+  "rows": 48000,
+  "weight_negative": 292,
+  "weight_missing": 300,
+  "weight_at_cap_47500": 1191,
+  "market_index_missing": 374,
+  "nan_weight_after_clean": 0,
+  "nan_mi_after_clean": 0,
+  "label_outliers": 451,
+  "label_outlier_pct": 0.94,
+  "rate_above_3x": 225,
+  "rate_below_third": 226,
+  "coord_rows_lon_clipped_at_-69.5": 2062,
+  "coord_rows_lat_clipped_at_25.5": 0,
+  "cities": 64
+ },
+ "validation": {
+  "rows": 12000,
+  "weight_negative": 145,
+  "weight_missing": 165,
+  "weight_at_cap_47500": 297,
+  "market_index_missing": 249,
+  "nan_weight_after_clean": 0,
+  "nan_mi_after_clean": 0,
+  "cities": 72,
+  "unseen_cities": [
+   "Allentown",
+   "Charlotte",
+   "Chicago",
+   "Jackson",
+   "Knoxville",
+   "Laredo",
+   "Norfolk",
+   "San Diego"
+  ],
+  "rows_touching_unseen": 1447,
+  "pct_rows_touching_unseen": 12.06
+ }
+}

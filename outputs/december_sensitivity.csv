@@ -1,0 +1,10 @@
+variant,mean,min,max,corr_with_primary
+primary (marginalise qs over day's <600mi loads),836.48,826.69,843.2,1.0
+qs: train-median plug-in,836.48,826.69,843.2,1.0
+qs: daily band-median plug-in,836.48,826.69,843.2,1.0
+qs: train 5-95pct grid mean,836.48,826.69,843.2,1.0
+MI: October mean,836.48,826.69,843.2,1.0
+MI: 7-day rolling mean,836.48,826.69,843.2,1.0
+no-market model,836.48,826.69,843.2,1.0
+alt model: MI only,826.54,819.67,833.26,0.95
+alt model: MI + qs,825.08,814.99,834.54,0.8

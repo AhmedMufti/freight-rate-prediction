@@ -1,0 +1,9 @@
+{
+ "mean": 836.4741935483871,
+ "min": 826.69,
+ "max": 843.2,
+ "corr_with_mi": 0.9579937858201869,
+ "mi_diff_sd_ratio_dec_vs_train": 0.9937149074782067,
+ "mi_smoothing": false,
+ "dec_qs_method": "none"
+}

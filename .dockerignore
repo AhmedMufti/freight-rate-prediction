@@ -1,0 +1,9 @@
+.venv
+data
+raw
+logs
+models
+outputs
+reports
+scorer_results
+.git

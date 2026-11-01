@@ -1,0 +1,9 @@
+{
+ "qs_pos_months": 6,
+ "qs_neg_months": 4,
+ "mi_pos_months": 10,
+ "auc": {
+  "all_features": 0.8074979928114645,
+  "without_market_cols": 0.5600609420949447
+ }
+}

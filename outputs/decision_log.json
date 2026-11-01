@@ -1,0 +1,221 @@
+{
+  "seeds": {
+    "maes": [
+      163.54383753662614,
+      164.5044313619832,
+      165.97542683923777
+    ],
+    "sd_pct": 0.7437032407018864,
+    "gate_pct": 1.4874064814037729
+  },
+  "outlier_target": {
+    "winner": "drop|log_rpm",
+    "gate_pct": 1.4874,
+    "table": {
+      "keep|log_rpm": {
+        "mean": 134.29943523827998,
+        "F1": 186.03184082008318,
+        "F2": 110.96198214535268,
+        "F3": 105.90448274940404,
+        "gap": 106.6876679786637,
+        "F3_smear": 106.62246837616118,
+        "mean_inner_iter": 121.66666666666667
+      },
+      "keep|log_rate": {
+        "mean": 145.13383015651723,
+        "F1": 198.17395278283354,
+        "F2": 120.24563736238734,
+        "F3": 116.98190032433088,
+        "gap": 118.39403565681907,
+        "F3_smear": 117.92815234774456,
+        "mean_inner_iter": 215.66666666666666,
+        "gain_vs_incumbent_pct": -8.067342129186462,
+        "vs": "keep|log_rpm",
+        "adopted": false
+      },
+      "drop|log_rpm": {
+        "mean": 131.89021416136464,
+        "F1": 187.62823151608333,
+        "F2": 107.42354617323356,
+        "F3": 100.61886479477697,
+        "gap": 102.16054284721076,
+        "F3_smear": 108.63449828543888,
+        "mean_inner_iter": 190.33333333333334,
+        "gain_vs_incumbent_pct": 1.7939175042998488,
+        "vs": "keep|log_rpm",
+        "adopted": true
+      },
+      "drop|log_rate": {
+        "mean": 136.88036366874724,
+        "F1": 192.3473097117598,
+        "F2": 111.58425271354072,
+        "F3": 106.70952858094122,
+        "gap": 108.22533459577728,
+        "F3_smear": 113.46405830414547,
+        "mean_inner_iter": 374.3333333333333,
+        "gain_vs_incumbent_pct": -3.7835631241581456,
+        "vs": "drop|log_rpm",
+        "adopted": false
+      },
+      "weight|log_rpm": {
+        "mean": 131.60309195116113,
+        "F1": 187.3054181229396,
+        "F2": 106.83542351718492,
+        "F3": 100.6684342133588,
+        "gap": 102.020624117936,
+        "F3_smear": 101.73752327281487,
+        "mean_inner_iter": 167.66666666666666,
+        "gain_vs_incumbent_pct": 0.2176978876175141,
+        "vs": "drop|log_rpm",
+        "adopted": false
+      },
+      "weight|log_rate": {
+        "mean": 137.06998251855484,
+        "F1": 192.94141370513526,
+        "F2": 111.61516419211824,
+        "F3": 106.65336965841095,
+        "gap": 108.16961729359923,
+        "F3_smear": 107.385795894713,
+        "mean_inner_iter": 390.6666666666667,
+        "gain_vs_incumbent_pct": -3.9273333432098845,
+        "vs": "drop|log_rpm",
+        "adopted": false
+      }
+    },
+    "notes": [
+      "keep|log_rate vs keep|log_rpm: gain -8.07% (gate 1.49%), F3 117.0 vs 105.9, gap 118.4 vs 106.7 -> reject",
+      "drop|log_rpm vs keep|log_rpm: gain +1.79% (gate 1.49%), F3 100.6 vs 105.9, gap 102.2 vs 106.7 -> ADOPT",
+      "drop|log_rate vs drop|log_rpm: gain -3.78% (gate 1.49%), F3 106.7 vs 100.6, gap 108.2 vs 102.2 -> reject",
+      "weight|log_rpm vs drop|log_rpm: gain +0.22% (gate 1.49%), F3 100.7 vs 100.6, gap 102.0 vs 102.2 -> reject",
+      "weight|log_rate vs drop|log_rpm: gain -3.93% (gate 1.49%), F3 106.7 vs 100.6, gap 108.2 vs 102.2 -> reject"
+    ],
+    "updates": {
+      "outlier_mode": "drop",
+      "target": "log_rpm"
+    }
+  },
+  "market": {
+    "winner": "no_qs_no_mi",
+    "gate_pct": 1.4874,
+    "table": {
+      "no_qs_no_mi": {
+        "mean": 136.92818040384262,
+        "F1": 193.34042930321272,
+        "F2": 111.09678803654784,
+        "F3": 106.34732387176736,
+        "gap": 108.18686183628755,
+        "F3_smear": 105.51724632300049,
+        "mean_inner_iter": 121.66666666666667
+      },
+      "no_qs": {
+        "mean": 129.82145029582833,
+        "F1": 133.84909784858564,
+        "F2": 110.5862513161298,
+        "F3": 145.0290017227696,
+        "gap": 143.71335842035896,
+        "F3_smear": 107.89732961907173,
+        "mean_inner_iter": 129.0,
+        "gain_vs_incumbent_pct": 5.190115056706657,
+        "vs": "no_qs_no_mi",
+        "adopted": false
+      },
+      "no_mi": {
+        "mean": 156.78860474725903,
+        "F1": 237.69165319477963,
+        "F2": 135.97565033440432,
+        "F3": 96.69851071259312,
+        "gap": 103.17860269812968,
+        "F3_smear": 108.01751056120175,
+        "mean_inner_iter": 92.33333333333333,
+        "gain_vs_incumbent_pct": -14.504263683956081,
+        "vs": "no_qs_no_mi",
+        "adopted": false
+      },
+      "full": {
+        "mean": 163.54383753662614,
+        "F1": 236.66849569195924,
+        "F2": 129.71274480377608,
+        "F3": 124.25027211414314,
+        "gap": 129.01692942032105,
+        "F3_smear": 106.24551203403458,
+        "mean_inner_iter": 99.66666666666667,
+        "gain_vs_incumbent_pct": -19.437676783760583,
+        "vs": "no_qs_no_mi",
+        "adopted": false
+      },
+      "qs_dev": {
+        "mean": 169.92189120277314,
+        "F1": 236.3899906701468,
+        "F2": 125.05243021340674,
+        "F3": 148.3232527247658,
+        "gap": 136.12452619061304,
+        "F3_smear": 107.97589271823308,
+        "mean_inner_iter": 121.0,
+        "gain_vs_incumbent_pct": -24.095632251609633,
+        "vs": "no_qs_no_mi",
+        "adopted": false
+      }
+    },
+    "notes": [
+      "no_qs vs no_qs_no_mi: gain +5.19% (gate 1.49%), F3 145.0 vs 106.3, gap 143.7 vs 108.2 -> reject",
+      "no_mi vs no_qs_no_mi: gain -14.50% (gate 1.49%), F3 96.7 vs 106.3, gap 103.2 vs 108.2 -> reject",
+      "full vs no_qs_no_mi: gain -19.44% (gate 1.49%), F3 124.3 vs 106.3, gap 129.0 vs 108.2 -> reject",
+      "qs_dev vs no_qs_no_mi: gain -24.10% (gate 1.49%), F3 148.3 vs 106.3, gap 136.1 vs 108.2 -> reject"
+    ],
+    "updates": {
+      "qs_variant": "none",
+      "use_mi": false
+    }
+  },
+  "recency": {
+    "winner": "h=3",
+    "gate_pct": 1.4874,
+    "table": {
+      "h=0": {
+        "mean": 134.27563544683514,
+        "F1": 193.83861748864737,
+        "F2": 107.57967423717594,
+        "F3": 101.40861461468204,
+        "gap": 104.01228465956297,
+        "F3_smear": 106.7416246854674,
+        "mean_inner_iter": 162.0
+      },
+      "h=3": {
+        "mean": 130.83800593020516,
+        "F1": 181.472857961594,
+        "F2": 109.68878895837824,
+        "F3": 101.35237087064324,
+        "gap": 102.13455299798717,
+        "F3_smear": 111.33385499132835,
+        "mean_inner_iter": 192.33333333333334,
+        "gain_vs_incumbent_pct": 2.560129025039,
+        "vs": "h=0",
+        "adopted": true
+      },
+      "h=6": {
+        "mean": 131.89021416136464,
+        "F1": 187.62823151608333,
+        "F2": 107.42354617323356,
+        "F3": 100.61886479477697,
+        "gap": 102.16054284721076,
+        "F3_smear": 108.63449828543888,
+        "mean_inner_iter": 190.33333333333334,
+        "gain_vs_incumbent_pct": -0.804206869157558,
+        "vs": "h=3",
+        "adopted": false
+      }
+    },
+    "notes": [
+      "h=3 vs h=0: gain +2.56% (gate 1.49%), F3 101.4 vs 101.4, gap 102.1 vs 104.0 -> ADOPT",
+      "h=6 vs h=3: gain -0.80% (gate 1.49%), F3 100.6 vs 101.4, gap 102.2 vs 102.1 -> reject"
+    ],
+    "updates": {
+      "recency_halflife": 3
+    }
+  },
+  "tune": {
+    "winner": "nl31_mcs80_huber",
+    "note": "tune: incumbent nl63_mcs40_l2 mean 130.84; best grid nl31_mcs80_huber mean 128.72 (gain +1.62%, gate 1.49%, F3 98.4 vs 101.4, gap 99.3 vs 102.1) -> ADOPT; n_final = round(1.1 * median inner iters [286, 160, 1980]) = 315",
+    "n_final": 315
+  }
+}
