@@ -2,10 +2,13 @@
 from __future__ import annotations
 
 import json
+import re
 
 import pandas as pd
 from docx import Document
 from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.oxml import OxmlElement
+from docx.oxml.ns import qn
 from docx.shared import Inches, Pt
 
 from . import config as C
@@ -16,26 +19,122 @@ def _j(p):
     return json.loads((C.OUT / p).read_text(encoding="utf-8"))
 
 
+def _shade(cell, fill):
+    tc_pr = cell._tc.get_or_add_tcPr()
+    shd = OxmlElement("w:shd")
+    shd.set(qn("w:val"), "clear")
+    shd.set(qn("w:color"), "auto")
+    shd.set(qn("w:fill"), fill)
+    tc_pr.append(shd)
+
+
 def _table(doc, header, rows, widths=None, size=8):
     t = doc.add_table(rows=1, cols=len(header))
-    t.style = "Light Grid Accent 1"
+    t.style = "Table Grid"
     for i, h in enumerate(header):
         t.rows[0].cells[i].text = str(h)
     for r in rows:
         cells = t.add_row().cells
         for i, v in enumerate(r):
             cells[i].text = str(v)
-    for row in t.rows:
+    for ri, row in enumerate(t.rows):
+        tr_pr = row._tr.get_or_add_trPr()
+        tr_pr.append(OxmlElement("w:cantSplit"))          # keep each row on one page
+        if ri == 0:
+            tr_pr.append(OxmlElement("w:tblHeader"))      # repeat the header row on the next page
         for c in row.cells:
+            if ri == 0:
+                _shade(c, "D9E2F3")
             for p in c.paragraphs:
                 for run in p.runs:
                     run.font.size = Pt(size)
+                    run.bold = True if ri == 0 else False
+    if widths:
+        t.autofit = False
+        for row in t.rows:
+            for c, w in zip(row.cells, widths):
+                c.width = Inches(w)
+    spacer = doc.add_paragraph()
+    spacer.paragraph_format.space_before = Pt(0)
+    spacer.paragraph_format.space_after = Pt(2)
+    spacer.add_run(" ").font.size = Pt(4)
     return t
+
+
+_CMP = re.compile(r"gain (?P<g>[+-]?[\d.]+)% \(gate (?P<gate>[\d.]+)%\), F3 (?P<f3a>[\d.]+) vs (?P<f3b>[\d.]+), "
+                  r"gap (?P<ga>[\d.]+) vs (?P<gb>[\d.]+) -> (?P<v>\w+)")
+
+
+def _cmps(why: str) -> dict:
+    """Comparisons recorded in a decisions.json _why string: 'A vs B' -> gain, F3 and gap numbers, verdict."""
+    out = {}
+    for piece in why.split(" | "):
+        if ": gain" not in piece:
+            continue
+        label = piece.split(": gain")[0].split(". ")[-1].strip()
+        m = _CMP.search(piece)
+        if m:
+            out[label] = m.groupdict()
+    return out
+
+
+def _sg(x) -> str:
+    return f"{float(x):+.1f}%".replace("-", "\u2212")
+
+
+def _why_evidence(dec: dict) -> dict:
+    """Plain-English evidence per setting, built from the numbers stored in config/decisions.json."""
+    w = dec["_why"]
+    out = {}
+    try:
+        o = _cmps(w["outlier_mode"])
+        d, wt, lr = o["drop|log_rpm vs keep|log_rpm"], o["weight|log_rpm vs drop|log_rpm"], o["drop|log_rate vs drop|log_rpm"]
+        out["outlier_mode"] = (f"Dropping flagged labels from fitting beat keeping them: {_sg(d['g'])} mean MAE (F3 {d['f3a']} vs "
+                               f"{d['f3b']}, gap {d['ga']} vs {d['gb']}). Down-weighting them instead gained only {_sg(wt['g'])}, "
+                               f"below the {d['gate']}% gate.")
+        sm = re.search(r"MAE ([\d.]+) plain vs ([\d.]+) with smear", w["target"])
+        out["target"] = (f"Predicting log rate per mile beat predicting log rate: the log-rate target was {_sg(lr['g'])} "
+                         f"(F3 {lr['f3a']} vs {lr['f3b']}, gap {lr['ga']} vs {lr['gb']})."
+                         + (f" A smearing correction on the back-transform also hurt F3 (MAE {sm.group(1)} plain vs "
+                            f"{sm.group(2)} smeared)." if sm else ""))
+        m = _cmps(w["qs_variant"])
+        q, qd = m["no_mi vs no_qs_no_mi"], m["qs_dev vs no_qs_no_mi"]
+        out["qs_variant"] = (f"Rejected. On its own the quote signal improved F3 ({q['f3a']} vs {q['f3b']}) and the gap fold "
+                             f"({q['ga']} vs {q['gb']}) but made the early folds so much worse that mean MAE was {abs(float(q['g'])):.1f}% worse "
+                             f"(its effect flips sign between months). The deviation form was worse still ({_sg(qd['g'])}).")
+        mi, full = m["no_qs vs no_qs_no_mi"], m["full vs no_qs_no_mi"]
+        out["use_mi"] = (f"Rejected. The market index alone made F3 ({mi['f3a']} vs {mi['f3b']}) and the gap fold ({mi['ga']} vs "
+                         f"{mi['gb']}) worse, and together with the quote signal it was worse again (F3 {full['f3a']} vs "
+                         f"{full['f3b']}, gap {full['ga']} vs {full['gb']}). The audit below confirms it helps early folds only.")
+        r = _cmps(w["recency_halflife"])
+        r3, r6 = r["h=3 vs h=0"], r["h=6 vs h=3"]
+        out["recency_halflife"] = (f"A 3-month half-life improved mean MAE by {_sg(r3['g'])} over no recency weighting (gap fold "
+                                   f"{r3['ga']} vs {r3['gb']}); 6 months was {_sg(r6['g'])} vs 3 months.")
+        t = re.search(r"incumbent (\S+) mean ([\d.]+); best grid (\S+) mean ([\d.]+) \(gain ([+-][\d.]+)%, gate ([\d.]+)%, "
+                      r"F3 ([\d.]+) vs ([\d.]+), gap ([\d.]+) vs ([\d.]+)\)", w["lgbm_params"])
+        out["lgbm_params"] = (f"Small grid: 31 leaves, min child 80 and a Huber loss beat the incumbent (63 leaves, min child 40, L2) "
+                              f"by {_sg(t.group(5))} (mean MAE {t.group(4)} vs {t.group(2)}; F3 {t.group(7)} vs {t.group(8)}, "
+                              f"gap {t.group(9)} vs {t.group(10)}).")
+        n = re.search(r"median inner iters \[(.*?)\]\) = (\d+)", w["n_final"])
+        out["n_final"] = f"1.1 x the median early-stopping round on the inner holdouts ({n.group(1)}) = {n.group(2)}."
+    except Exception:  # never fail the report over wording: fall back to the first sentence of the raw note
+        for k, v in w.items():
+            out.setdefault(k, v.split(" | ")[0][:200])
+    return out
+
+
+def _setting_value(dec: dict, k: str) -> str:
+    v = dec[k]
+    if k == "lgbm_params":
+        return (f"learning rate {v['learning_rate']}, {v['num_leaves']} leaves, min child {v['min_child_samples']}, "
+                f"feature/bagging fraction {v['feature_fraction']}, L2 {v['lambda_l2']}, {v['objective']} loss")
+    return v if isinstance(v, str) else json.dumps(v)
 
 
 def _pic(doc, path, width=6.2, caption=None):
     doc.add_picture(str(path), width=Inches(width))
     doc.paragraphs[-1].alignment = WD_ALIGN_PARAGRAPH.CENTER
+    doc.paragraphs[-1].paragraph_format.keep_with_next = True
     if caption:
         p = doc.add_paragraph(caption)
         p.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -157,13 +256,17 @@ def build() -> str:
                       f"seed noise sd = {dec['seed_sd_mae_pct']}% of MAE, so the adoption gate is {dec['gate_pct']}%.")
     doc.add_paragraph("Decision rule: adopt the more complex option only if mean MAE improves by at least the gate and neither "
                       "F3 nor the gap fold gets worse. Decisions and evidence (from config/decisions.json):")
+    ev = _why_evidence(dec)
     _table(doc, ["setting", "value", "evidence"],
-           [[k, json.dumps(dec[k]) if not isinstance(dec[k], str) else dec[k], dec["_why"].get(k, "default")[:420]]
-            for k in ("outlier_mode", "target", "qs_variant", "use_mi", "mi_date_mean", "recency_halflife", "lgbm_params", "n_final")], size=7)
+           [[k, _setting_value(dec, k), ev.get(k, "default (not tuned)")]
+            for k in ("outlier_mode", "target", "qs_variant", "use_mi", "mi_date_mean", "recency_halflife", "lgbm_params", "n_final")],
+           widths=[1.3, 1.9, 3.6], size=8)
     for stage in ("market",):
         if stage in dlog:
             doc.add_paragraph()
-            doc.add_paragraph("Market-feature ablation (mean MAE over F1-F3, F3, gap):")
+            doc.add_paragraph("Market-feature ablation (mean MAE over F1-F3, F3, gap). Variants: no_qs_no_mi = neither market input "
+                              "(the baseline); no_qs = market index only; no_mi = quote signal only; full = both; qs_dev = quote "
+                              "signal as a deviation from the day's median.")
             _table(doc, ["variant", "mean MAE", "F3", "gap", "decision"],
                    [[k, f"{s['mean']:.0f}", f"{s['F3']:.0f}", f"{s['gap']:.0f}",
                      "baseline" if "adopted" not in s else ("adopt" if s["adopted"] else "reject")] for k, s in dlog[stage]["table"].items()])
@@ -220,8 +323,10 @@ def build() -> str:
             "that day's validation loads under 600 mi.")
     if not dec["use_mi"] and dec["qs_variant"] == "none":
         doc.add_paragraph(
-            "The sequential CV ablation rejected both market_index and quote_signal as model inputs (they improved some folds but "
-            "made the selection fold and the gap fold worse; see section 5), so the chosen model's December curve is driven by "
+            "The sequential CV ablation rejected both market_index and quote_signal as model inputs. The market index improved the "
+            "early folds but made the selection fold and the gap fold worse; the quote signal alone improved those two late folds but "
+            "made the early folds so much worse (its effect flips sign between months) that mean MAE got worse by far more than the gate "
+            "(see section 5). So the chosen model's December curve is driven by "
             "distance, equipment, weight, lane geography and day of week only. In the sensitivity table the first six rows are "
             "therefore identical by construction; the two 'alt model' rows show what a market-aware model would predict.")
     _pic(doc, C.REPORTS / "candidate_december.png", 5.4, "score.py candidate_december.png")

@@ -56,7 +56,7 @@ Temporal CV MAE in dollars (full table with RMSE/MAPE/WAPE/R2 in `outputs/cv_sum
 
 Mean MAPE 5.4% (b0 11.6%). Random 5-fold gives 117.7, i.e. optimistic versus temporal CV.
 Chosen configuration (`config/decisions.json`): log rate-per-mile target, label outliers dropped from fitting only,
-no market_index / quote_signal inputs (the CV rule rejected both: they help some folds but hurt F3 and the gap fold),
+no market_index / quote_signal inputs (the CV rule rejected both: the market index helps early folds but hurts F3 and the gap fold; the quote signal alone helps F3 and the gap fold but badly hurts early folds, so mean MAE is worse),
 recency half-life 3 months, Huber objective, 31 leaves, min_child_samples 80, 315 rounds.
 December (Lexington to Fort Wayne): mean $836, range $827-$843, weekly shape from day of week.
 
